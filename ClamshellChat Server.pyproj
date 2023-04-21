@@ -25,6 +25,9 @@
   <ItemGroup>
     <Compile Include="bot.py" />
     <Compile Include="ClamshellChat_Server.py" />
+    <Compile Include="creds.py" />
+    <Compile Include="python_client.py" />
+    <Compile Include="python_server.py" />
     <Compile Include="responses.py" />
   </ItemGroup>
   <ItemGroup>

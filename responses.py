@@ -1,6 +1,7 @@
-﻿def get_response(message: str) -> str:
+﻿def get_response(message: str) -> str: #returns string
     p_message = message.lower()
 
+    #Check string and generate response accordingly
     if 'hello' in p_message:
         return 'hai :3'
 
