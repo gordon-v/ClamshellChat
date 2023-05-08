@@ -13,3 +13,5 @@
     if 'nig' in p_message:
        return '📸'
 
+    return ''
+

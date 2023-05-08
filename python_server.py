@@ -1,11 +1,16 @@
+import asyncio
 import socket
 import threading
+import bot
+import creds
+
+
 # CREDIT: https://gist.github.com/lichard49/abbe8b6877b259da128682db0a81a13e
 # data settings
 data_size = 16 # sending 16 bytes = 128 bits (binary touch states, for example)
 
 # server settings
-server_name = socket.gethostname() #str([l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0]) # https://stackoverflow.com/a/1267524
+server_name = '127.0.0.1' #socket.gethostname() #str([l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) if l][0][0]) # https://stackoverflow.com/a/1267524
 server_port = 8888
 server_address = (server_name, server_port)
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -18,6 +23,11 @@ def broadcast(sender, message):
 		#if connection != sender:
 			#TODO send the message better
 		connection.send(message)
+			#bot.text_tedi(message))
+
+
+			
+			
 
 def handle_client(connection, addr):
 	while True:
@@ -25,8 +35,10 @@ def handle_client(connection, addr):
 		try:
 			#wait for message
 			message = connection.recv(1024)
-			print(f"SERVER: {str(addr)} said: {message.decode('ascii')}")
-			broadcast(connection,message)
+			message1 = message.decode('ascii')
+			message2 = message1 + str("^")
+			print(f"SERVER: {str(addr)} {message2}")
+			broadcast(connection,message2.encode('ascii'))
 		except:
 			print(f"SERVER: {addr} has disconnected.")
 			#index = connections.index(connection)
@@ -34,12 +46,11 @@ def handle_client(connection, addr):
 			connection.close()
 			break;
 
-
 def run_server():
 	
 	# start up server
 	print('SERVER: Setting up server on:', server_address)
-	server_socket.listen(1)
+	server_socket.listen(2)
 
 	# wait for connection
 	print('SERVER: Waiting for a client connections...')
@@ -51,13 +62,20 @@ def run_server():
 		connections.append(connection)
 
 		#msg="This is a temporary message :) This is a temporary message :) This is a temporary message :)"
+		#query the client for nickname
 		connection.send('NICK'.encode('ascii'))
-		print(f"SERVER: {connection.recv(1024).decode('ascii')} has joined the chat.")
+		try:
+			print(f"SERVER: {connection.recv(1024).decode('ascii')} has joined the chat.")
+		except:
+			print(f"SERVER: {client_address} has disconnected.")
+			connections.remove(connection)
+			connection.close()
+			break;
 
 		#each connection gets its own thread
 		thread = threading.Thread(target=handle_client,args=(connection, client_address))
 		thread.start()
-		print(f'SERVER: Active connections ({threading.activeCount() -1 })')
+		print(f'SERVER: Active connections ({threading.activeCount() -3 })')
 
 	# data formatting
 	def data2binary(data):
@@ -73,3 +91,4 @@ def run_server():
 	# process data
 
 
+	
